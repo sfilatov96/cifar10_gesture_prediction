@@ -1,3 +1,4 @@
+#coding=utf8
 from six.moves import cPickle as pick
 import numpy as np
 import os

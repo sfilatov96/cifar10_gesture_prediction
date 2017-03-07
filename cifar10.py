@@ -72,7 +72,7 @@ model.add(Dropout(0.5))
 model.add(Dense(nb_classes, activation='softmax'))
 
 # Задаем параметры оптимизации
-sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
+sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
 model.compile(loss='categorical_crossentropy', optimizer=sgd,metrics=['accuracy'])
 #Обучаем модель
 model.fit(X_train, Y_train,batch_size=batch_size,nb_epoch=nb_epoch,validation_split=0.1,shuffle=True)

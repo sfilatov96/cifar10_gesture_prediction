@@ -87,7 +87,10 @@ def conserve_test_files(live=False):
 
         for i in range(1, countOfFiles + 1):
             try:
-                file = "/home/sfilatov96/test_dataset/%s_test/%s_test_%s.jpg" % (j, j, i)
+                if not live:
+                    file = "/home/sfilatov96/test_dataset/%s_test/%s_test_%s.jpg" % (j, j, i)
+                else:
+                    file = "/home/sfilatov96/live_dataset/%s/%s_%s.jpg" % (j, j, i)
                 img = Image.open(fp=file)
                 new_width = 32
                 new_height = 32
@@ -168,4 +171,4 @@ def conserve_vk_files():
 
 
 
-conserve_test_files(True)
+conserve_test_files(live=True)
