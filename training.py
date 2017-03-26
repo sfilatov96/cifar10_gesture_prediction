@@ -1,9 +1,11 @@
+#coding=utf-8
 import os
 from six.moves import cPickle
 from matplotlib import pyplot
 from scipy.misc import toimage
 import numpy as np
 from PIL import Image
+import random
 
 def chunks(lst, count):
     for i in range(0,len(lst),count):
@@ -11,33 +13,30 @@ def chunks(lst, count):
 
 
 def conserve_training_files():
+    shuffle_list = []
     count_part = 1
-    j = int(input())
-    path = "/home/sfilatov96/hands_dataset/%s/" % j
-
-    listOfFiles = os.listdir(path)
-
-    countOfFiles = len(listOfFiles)
-
-    print("Gesture %s" % j)
     dct = {"data": [], "label": []}
-
-
-    for i in range(1,countOfFiles+1):
+    for i in range(0,10):
+        print("Выгрузка фотографий -- %s" % i)
+        path = "/home/sfilatov96/hands_dataset/%s/" % i
+        listOfFiles = os.listdir(path)
+        for l in listOfFiles:
+            print("Photo %s Folder %s" % (l,i))
+            shuffle_list.append((path+l,i))
+    random.shuffle(shuffle_list)
+    countOfFiles = len(shuffle_list)
+    print("Всего %s" % countOfFiles)
+    i = 0
+    for l,k in shuffle_list:
         try:
-            file = "/home/sfilatov96/hands_dataset/%s/%s_%s.jpg" % (j,j,i)
+            file = l
             img = Image.open(fp=file)
             new_width = 32
             new_height = 32
-
             img = img.resize((new_width, new_height), Image.ANTIALIAS)
-
 
             lst = np.array(img.getdata()).transpose()
             r,g,b = lst
-
-
-
 
             r = list(r)
             r = list(chunks(r,32))
@@ -50,21 +49,21 @@ def conserve_training_files():
             b = list(chunks(b,32))
             lst = [r[0],g[0],b[0]]
 
-
-
             dct["data"].append(lst)
-            dct["label"].append(j)
+            dct["label"].append(k)
 
-            print("Number %s" % i)
-        except:
-            print("Error %s" % i)
+            print("Number %s/%s Path %s" % (i,countOfFiles,l))
+        except Exception as e:
+            #print("Error %s" % i,e)
+            pass
         if i % 5000 == 0 or i == countOfFiles:
-            fs = "%s/%s_part%s.pkl" % (j,j, count_part)
+            fs = "shuffle/part%s.pkl" % (count_part)
             fp = open(fs, 'wb')
             cPickle.dump(dct, fp, 2)
             fp.close()
             dct = {"data": [], "label": []}
             count_part += 1
+        i += 1
 
 
 def conserve_test_files(live=False):
@@ -115,8 +114,8 @@ def conserve_test_files(live=False):
                 dct["label"].append(j)
 
                 print("Number %s" % i)
-            except:
-                print("Error %s" % i)
+            except Exception as e:
+                print("Error %s" % i,e)
 
         fp = open(fs, 'wb')
         cPickle.dump(dct, fp, 2)
@@ -136,7 +135,7 @@ def conserve_vk_files():
 
     fs = "vk.pkl"
 
-    for i in range(1, countOfFiles + 1):
+    for i in listOfFiles:
         try:
             file = "/home/sfilatov96/vk_dataset/%s.jpg" %  i
             img = Image.open(fp=file)
@@ -171,4 +170,4 @@ def conserve_vk_files():
 
 
 
-conserve_test_files(live=True)
+conserve_training_files()

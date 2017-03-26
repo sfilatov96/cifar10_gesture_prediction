@@ -18,7 +18,7 @@ from src.gesture5 import get_test_data,get_vk_data,get_live_data
 
 real = X_test
 
-nb_classes = 5
+nb_classes = 10
 
 
 X_test = X_test.astype('float32')
@@ -26,7 +26,7 @@ X_test /= 255
 
 Y_test = np_utils.to_categorical(y_test, nb_classes)
 
-model = load_model("gesture_model4.h5")
+model = load_model("gesture10_model1.h5")
 
 
 # Оцениваем качество обучения модели на тестовых данных

@@ -8,22 +8,30 @@ from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.utils import np_utils
 from PIL import Image
 from keras.optimizers import SGD
-from src.gesture5 import get_training_data, get_test_data
+from src.gesture5 import get_training_data, get_test_data,get_part_generator
+from keras.applications.resnet50 import ResNet50
+
 
 # Задаем seed для повторяемости результатов
 np.random.seed(42)
 
 # Загружаем данные
-(X_train, y_train) = get_training_data()
-(X_test, y_test) = get_test_data()
 
 
 
+
+
+# def prepare():
+#             (X_train, y_train) = get_training_data(i)
+#             X_train = X_train.astype('float32')
+#             X_train /= 255
+#             Y_train = np_utils.to_categorical(y_train, nb_classes)
+#             yield X_train,Y_train
 
 # Размер мини-выборки
 batch_size = 32
 # Количество классов изображений
-nb_classes = 5
+nb_classes = 10
 # Количество эпох для обучения
 nb_epoch = 10
 # Размер изображений
@@ -32,17 +40,12 @@ img_rows, img_cols = 32, 32
 img_channels = 3
 
 # Нормализуем данные
-X_train = X_train.astype('float32')
-X_test = X_test.astype('float32')
-X_train /= 255
-X_test /= 255
+# (X_test, y_test) = get_test_data()
+# X_test = X_test.astype('float32')
+# X_test /= 255
+# Y_test = np_utils.to_categorical(y_test, nb_classes)
 
-# Преобразуем метки в категории
-Y_train = np_utils.to_categorical(y_train, nb_classes)
-Y_test = np_utils.to_categorical(y_test, nb_classes)
-
-# Создаем последовательную модель
-
+#
 model = Sequential()
 # Первый сверточный слой
 model.add(Convolution2D(32, 3, 3, border_mode='same',
@@ -70,18 +73,20 @@ model.add(Dense(512, activation='relu'))
 model.add(Dropout(0.5))
 # Выходной полносвязный слой
 model.add(Dense(nb_classes, activation='softmax'))
-
-# Задаем параметры оптимизации
 sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
 model.compile(loss='categorical_crossentropy', optimizer=sgd,metrics=['accuracy'])
 #Обучаем модель
-model.fit(X_train, Y_train,batch_size=batch_size,nb_epoch=nb_epoch,validation_split=0.1,shuffle=True)
+try:
+    model.fit_generator(get_part_generator(), samples_per_epoch=205 -000, nb_epoch=5, nb_worker=9)
+except Exception as e:
+    print e
 
-model.save(filepath="gesture_model4.h5")
+model.save(filepath="gesture10_model1.h5")
+
 
 # Оцениваем качество обучения модели на тестовых данных
-scores = model.evaluate(X_test, Y_test, verbose=0)
-print("Точность работы на тестовых данных: %.2f%%" % (scores[1]*100))
+# scores = model.evaluate(X_test, Y_test, verbose=0)
+# print("Точность работы на тестовых данных: %.2f%%" % (scores[1]*100))
 
 
 

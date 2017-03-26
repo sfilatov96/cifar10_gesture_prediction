@@ -10,13 +10,13 @@ RATE = 0.1
 
 def test_photo(photo_path):
     print photo_path
-    with open(photo_path, 'rb') as file:
-        photo = base64.b64encode(file.read())
-        response = requests.post(
-            'http://localhost:5000/api/photo',
-            data=json.dumps({'photo': photo})
-        )
-        print(response.text)
+    files = {'file': open(photo_path, 'rb')}
+    response = requests.post(
+        'http://127.0.0.1:5000/api/photo',
+        files=files
+
+    )
+    print(0)
 
 
 def get_files_in_path(path):
