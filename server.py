@@ -55,6 +55,7 @@ def photo():
     try:
         f = request.files["file"]
         photobytes = f.stream.read()
+        print type(photobytes)
         img = cv2.imdecode(np.frombuffer(photobytes, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
 
 
