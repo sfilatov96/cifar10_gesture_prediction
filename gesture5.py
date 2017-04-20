@@ -5,6 +5,16 @@ import os
 from keras.utils import np_utils
 from random import shuffle
 
+gesture_symbols = {
+    0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9,
+    "а": 10, "б": 11, "в": 12, "г": 13, "д": 14, "е": 15, "ё": 16, "ж": 17, "з": 18,
+    "и": 19, "й": 20, "к": 21, "л": 22, "м": 23, "н": 24, "о": 25, "п": 26, "р": 27,
+    "с": 28, "т": 29, "у": 30, "ф": 31, "х": 32, "ц": 33, "ч": 34, "ш": 35, "щ": 36,
+    "ъ": 37, "ы": 38, "ь": 39, "э": 40, "ю": 41, "я": 42, "*": 43
+}
+
+
+
 def get_data_from_pkl(i=None,part=None,test=False,vk=False,live=False):
     if test:
         fs = open("saving_models/%s_test.pkl" % i, "rb")
@@ -64,6 +74,7 @@ def get_vk_data():
     print(np.array(data), np.array(label))
     return (np.array(data), np.array(label))
 
+
 def get_live_data():
     data, label = get_data_from_pkl(1,live=True)
     for i in range(2, 6):
@@ -74,8 +85,9 @@ def get_live_data():
     print("Суммарно:", len(data), len(label))
     return (np.array(data), np.array(label))
 
+
 def get_part_generator():
-    nb_classes = 10
+    nb_classes = 20
     shuffle_list =[]
     path = "saving_models/shuffle/"
     listOfFiles = os.listdir(path)
@@ -83,15 +95,23 @@ def get_part_generator():
         shuffle_list.append(l)
         print("Выгрузка сериализованных данных -- %s" % l)
     print shuffle_list
+    shuffle(shuffle_list)
+    shuffle(shuffle_list)
+    shuffle(shuffle_list)
+    print shuffle_list
     while True:
         for l in shuffle_list:
             print("part: %s" % l)
             data, label = get_data_from_pkl(part=l)
+            print label
+            for i in range(len(label)):
+                if label[i] > 15:
+                    label[i] -= 1
             data = np.array(data)
             label = np.array(label)
             X_train = data.astype('float32')
             X_train /= 255
             Y_train = np_utils.to_categorical(label, nb_classes)
-            for ind in range(0,len(X_train),32):
+            for ind in range(0,len(X_train), 32):
                 print ind
                 yield np.array(X_train[ind:ind+32]), np.array(Y_train[ind:ind+32])

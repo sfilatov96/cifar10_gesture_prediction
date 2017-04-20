@@ -5,9 +5,10 @@ from keras.models import Sequential,Model,load_model
 from keras.layers import Dense, Flatten, Activation
 from keras.layers import Dropout
 from keras.layers.convolutional import Convolution2D, MaxPooling2D
+from keras import optimizers
 from keras.utils import np_utils
 from PIL import Image
-from keras.optimizers import SGD
+from keras.optimizers import SGD,Adagrad
 from src.gesture5 import get_training_data, get_test_data,get_part_generator
 from keras.applications.resnet50 import ResNet50
 
@@ -29,9 +30,9 @@ np.random.seed(42)
 #             yield X_train,Y_train
 
 # Размер мини-выборки
-batch_size = 32
+#batch_size = 32
 # Количество классов изображений
-nb_classes = 10
+nb_classes = 20
 # Количество эпох для обучения
 nb_epoch = 10
 # Размер изображений
@@ -73,15 +74,20 @@ model.add(Dense(512, activation='relu'))
 model.add(Dropout(0.5))
 # Выходной полносвязный слой
 model.add(Dense(nb_classes, activation='softmax'))
-sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+#sgd = SGD(lr=0.01, decay=1e-6, momentum=0.7, nesterov=True)
+sgd = Adagrad(lr=0.01, epsilon=1e-08, decay=0.0)
+
+
+
+
 model.compile(loss='categorical_crossentropy', optimizer=sgd,metrics=['accuracy'])
 #Обучаем модель
 try:
-    model.fit_generator(get_part_generator(), samples_per_epoch=205 -000, nb_epoch=5, nb_worker=9)
+    model.fit_generator(get_part_generator(), samples_per_epoch=400000, nb_epoch=5 , nb_worker=9)
 except Exception as e:
     print e
 
-model.save(filepath="gesture10_model1.h5")
+model.save(filepath="gesture20_model1.h5")
 
 
 # Оцениваем качество обучения модели на тестовых данных

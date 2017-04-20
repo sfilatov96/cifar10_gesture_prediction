@@ -7,6 +7,16 @@ import numpy as np
 from PIL import Image
 import random
 
+gesture_symbols = {
+    0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9,
+    "а": 10, "б": 11, "в": 12, "г": 13, "д": 14, "е": 15, "ё": 16, "ж": 17, "з": 18,
+    "и": 19, "й": 20, "к": 21, "л": 22, "м": 23, "н": 24, "о": 25, "п": 26, "р": 27,
+    "с": 28, "т": 29, "у": 30, "ф": 31, "х": 32, "ц": 33, "ч": 34, "ш": 35, "щ": 36,
+    "ъ": 37, "ы": 38, "ь": 39, "э": 40, "ю": 41, "я": 42, "*": 43
+}
+
+pathes = ["а", "б", "в", "г", "д", "е", "ж", "з", "и", "й"]
+
 def chunks(lst, count):
     for i in range(0,len(lst),count):
         yield lst[i:i+count]
@@ -14,9 +24,9 @@ def chunks(lst, count):
 
 def conserve_training_files():
     shuffle_list = []
-    count_part = 1
+    count_part = 43
     dct = {"data": [], "label": []}
-    for i in range(0,10):
+    for i in pathes:
         print("Выгрузка фотографий -- %s" % i)
         path = "/home/sfilatov96/hands_dataset/%s/" % i
         listOfFiles = os.listdir(path)
@@ -24,6 +34,7 @@ def conserve_training_files():
             print("Photo %s Folder %s" % (l,i))
             shuffle_list.append((path+l,i))
     random.shuffle(shuffle_list)
+
     countOfFiles = len(shuffle_list)
     print("Всего %s" % countOfFiles)
     i = 0
@@ -50,14 +61,14 @@ def conserve_training_files():
             lst = [r[0],g[0],b[0]]
 
             dct["data"].append(lst)
-            dct["label"].append(k)
+            dct["label"].append(gesture_symbols[k])
 
             print("Number %s/%s Path %s" % (i,countOfFiles,l))
         except Exception as e:
             #print("Error %s" % i,e)
             pass
         if i % 5000 == 0 or i == countOfFiles:
-            fs = "shuffle/part%s.pkl" % (count_part)
+            fs = "saving_models/shuffle/part%s.pkl" % (count_part)
             fp = open(fs, 'wb')
             cPickle.dump(dct, fp, 2)
             fp.close()
@@ -169,5 +180,5 @@ def conserve_vk_files():
         cPickle.dump(dct, fp, 2)
 
 
-
-conserve_training_files()
+if __name__ == "__main__":
+    conserve_training_files()

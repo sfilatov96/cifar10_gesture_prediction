@@ -11,8 +11,8 @@ from keras.models import load_model
 import json
 
 BUFF = 1024
-HOST = '192.168.1.35'
-PORT = 5000
+HOST = '192.168.1.37'
+PORT = 9000
 WORKERS_COUNT = 2
 NCPU = 2
 forks = []
@@ -28,9 +28,13 @@ forks = []
 
 def handler(serversock, pid):
     while 1:
-        print('waiting for connection... listening on port', PORT)
-        conn, addr = serversock.accept()
-        parse(conn, addr, pid)
+        try:
+            print('waiting for connection... listening on port', PORT)
+            conn, addr = serversock.accept()
+            conn.settimeout(2)
+            parse(conn, addr, pid)
+        except:
+            conn.close()
 
 
 def parse(conn, addr, pid):
@@ -38,10 +42,10 @@ def parse(conn, addr, pid):
     print("send on PID: ", pid)
     while True:
         tmp = conn.recv(1024)
-        if not tmp:
-            break
         data += tmp
-    print len(data)
+        if "\r\r\n" in tmp:
+            break
+
     conn.send(photo(data))
     conn.close()
 
@@ -55,7 +59,7 @@ def get_from_webcam(frame):
     new_width = 32
     new_height = 32
     img = img.resize((new_width, new_height), Image.ANTIALIAS)
-    img = img.rotate(-90)
+    #img = img.rotate(-90)
 
 
     lst = np.array(img.getdata()).transpose()
@@ -114,7 +118,7 @@ if __name__ == "__main__":
     ROOT_DIR = args['r'] or ""
     ADDR = (HOST, PORT)
     serversock = socket(AF_INET, SOCK_STREAM)
-    #serversock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+    serversock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     serversock.bind(ADDR)
     serversock.listen(5)
     for x in range(0, WORKERS_COUNT * NCPU):

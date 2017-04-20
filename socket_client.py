@@ -6,7 +6,7 @@ import os
 from socket import *
 
 PHOTOS_PATH = '/home/sfilatov96/vk_dataset/'
-RATE = 0.1
+RATE = 0.01
 
 
 def test_photo(photo_path):
@@ -15,11 +15,11 @@ def test_photo(photo_path):
     l = file.read()
     print len(l)
     sock = socket(AF_INET, SOCK_STREAM)
-    sock.connect(('192.168.1.35', 5000))
-    sock.setblocking(0)
-    sock.send(l)
+    sock.connect(('62.109.1.48', 6000))
+    sock.send(l+"\r\r\n")
 
     data = sock.recv(1024)
+    print data
     sock.close()
 
 
@@ -35,4 +35,3 @@ if __name__ == '__main__':
         test_photo(PHOTOS_PATH+photo_path)
         if RATE:
             time.sleep(RATE)
-        break
